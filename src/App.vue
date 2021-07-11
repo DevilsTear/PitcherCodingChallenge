@@ -5,19 +5,18 @@
         <v-row>
           <v-col cols="3">
             <v-img
-              :lazy-src="logo"
+              lazy-src="./assets/images/company/movie_list_logo.png"
               max-height="50"
               max-width="100"
-              :src="logo"
+              src="./assets/images/company/movie_list_logo.png"
             ></v-img>
             <h2>Movie Listing</h2>
           </v-col>
           <v-col cols="9">
             <v-autocomplete
-              v-model="model"
-              :items="items"
-              :loading="isLoading"
-              :search-input.sync="search"
+              :items="movieItems"
+              :loading="isLoading.value"
+              :search-input.sync="movieName"
               color="black"
               hide-no-data
               hide-selected
@@ -34,85 +33,99 @@
     </v-app-bar>
 
     <v-main>
-      <SearchResults ref="searchResults" :movies="movies" :loading="isLoading" />
+      <loader v-if="isLoading.value">
+        <template #default> Loading search results... </template>
+      </loader>
+      <router-view v-else-if="!isLoading.value && movies.values.length > 0"></router-view>
+      <warning v-else
+        ><template #default>
+          Use search bar to list movies!..
+        </template></warning
+      >
     </v-main>
   </v-app>
 </template>
 
 <script>
-import logo from "./assets/images/company/movie_list_logo.png";
-import SearchResults from "./components/SearchResults.vue";
+import Loader from "./components/Loader.vue";
+import Warning from "./components/Warning.vue";
+// import eventBus from "./eventBus";
+
+import {
+  ref,
+  reactive,
+  computed,
+  watch,
+  provide,
+} from "@vue/composition-api";
 
 export default {
-  name: "MovieListing",
-
-  data: () => ({
-    logo,
-    descriptionLimit: 60,
-    movies: [],
-    isLoading: false,
-    model: null,
-    search: null,
-    hasData: false,
-    hideDetails: true,
-  }),
   components: {
-    SearchResults,
+    Loader,
+    Warning,
   },
+  setup() {
+    const movieName = ref(null);
+    const descriptionLimit = 60;
+    const movies = reactive([]);
+    const isLoading = ref(false);
+    const hasData = ref(false);
+    const movieCount = ref(0);
 
-  computed: {
-    fields() {
-      if (!this.model) return [];
+    watch(movieName, (val) => {
+      searchMovies(val);
+    });
 
-      return Object.keys(this.model).map((key) => {
-        return {
-          key,
-          value: this.model[key] || "n/a",
-        };
-      });
-    },
-    items() {
-      if (!this.hasData) return [];
-      return this.movies.map((entry) => {
+    const movieItems = computed(() => {
+      if (!hasData.value) return [];
+      return movies.values.map((entry) => {
         const Description =
-          entry.Title.length > this.descriptionLimit
-            ? entry.Title.slice(0, this.descriptionLimit) + "..."
+          entry.Title.length > descriptionLimit
+            ? entry.Title.slice(0, descriptionLimit) + "..."
             : entry.Title;
 
         return Object.assign({}, entry, { Description });
       });
-    },
-  },
+    });
 
-  watch: {
-    search(val) {
+    function searchMovies(val) {
       if (!val) {
         return;
-      } else {
-        this.$refs.searchResults.hideDetails();
       }
-      // Items have already been loaded
-      // if (this.items.length > 0) return;
 
       // Items have already been requested
-      if (this.isLoading) return;
+      if (isLoading.value) return;
 
-      this.isLoading = true;
+      isLoading.value = true;
+          console.log(`searchMovies.val: ${val}`);
 
       // Lazily load input items
       fetch("https://www.omdbapi.com/?apikey=5300d89d&y=2020&s=" + val)
         .then((res) => res.json())
         .then((res) => {
+          movies.values = [];
           const { totalResults, Search, Response } = res;
-          this.count = totalResults;
-          this.movies = Search;
-          this.hasData = Response === "True";
+          movieCount.value = totalResults;
+          if (Search && Search.length > 0) {
+            Search.forEach((item) => {
+              movies.values.push(item);
+            });
+          }
+
+          hasData.value = Response === "True";
         })
         .catch((err) => {
           console.log(err);
         })
-        .finally(() => (this.isLoading = false));
-    },
+        .finally(() => {
+          isLoading.value = false;
+        });
+    }
+
+    provide("movies", movies);
+    provide("isLoading", isLoading);
+
+    return { movieName: movieName, movieItems, isLoading, movies };
   },
 };
 </script>

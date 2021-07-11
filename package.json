@@ -12,6 +12,7 @@
     "@vue/composition-api": "^1.0.0-rc.13",
     "core-js": "^3.6.5",
     "vue": "^2.6.11",
+    "vue-router": "^3.5.2",
     "vuetify": "^2.4.0"
   },
   "devDependencies": {
