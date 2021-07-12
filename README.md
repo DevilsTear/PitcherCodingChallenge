@@ -1,4 +1,4 @@
-#PITCHER Coding Challenge
+# PITCHER Coding Challenge
 
 ### Hosting URL
 - https://pitchercodingchallenge.web.app/
@@ -16,7 +16,7 @@ UI should have
 - **[x]** provided data parameters from API (title, year etc.) should be displayed in a user friendly way e.g. when selecting a movie or in the search results area
 
 ### Submission
-Project can be published on a** [x]** github repository or **[ ]** archived & sent as a Zip file.
+Project can be published on a **[x]** github repository or **[ ]** archived & sent as a Zip file.
 
 ### Requirements
 - **[x]** Using Vue.js version 2.* for JavaScript framework
