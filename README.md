@@ -1,5 +1,8 @@
 #PITCHER Coding Challenge
 
+### Hosting URL
+- https://pitchercodingchallenge.web.app/
+
 ### Goals
 Create a web application that retrieves and displays movies with posters that are released in 2020. It should cache the data on first execution and should display the data from cache on next opening for the same movie. You should then be able to do full-text search of movies.
 
@@ -22,7 +25,7 @@ Project can be published on a** [x]** github repository or **[ ]** archived & se
 - **[x]** Full-text search
 
 ### Bonus
-- **[ ]** Deploying project somewhere for a live version
+- **[x]** Deploying project somewhere for a live version
 - **[x]** Adding a loading bar when information is retrieving
 - **[x]** Text highlight in search box when finding matches
 - **[x]** Error handling
